@@ -1,2 +1,2 @@
-# soka-to-station
+# hayakuienikaeritai
 創価大学から早く八王子駅に行くプロジェクト
