@@ -3,13 +3,13 @@ class DTime {
     // 内部では「0時からの経過分」で持つ（25:30なら 25*60 + 30 = 1530）  
     constructor(readonly Minutes: number, readonly Delay:number = 0) {
     }
-  
+
     // GTFSやCSVの "HH:mm:ss" または "HH:mm" からインスタンスを作る
     static fromString(timeStr: string): DTime {
-        const [h=0, m=0] = timeStr.split(":").map(Number);
+        const [h=0, m=0] = timeStr.split(":").map(Number); //ssはvoid
         return new DTime(h * 60 + m);
     }
-  
+
     // フロントエンドに渡しやすい文字列フォーマットに戻す
     toString(): string {
         const h = Math.floor(this.Minutes / 60).toString().padStart(2, "0");
@@ -49,8 +49,8 @@ interface BusExport {
 }
 
 interface frontexport {
-    buses:BusExport[]
-    time:Date
+    buses:BusExport[]   //プレーンjson用
+    time:Date           //
 }
 
 function getBuildingData(buildingname:string): SokaBuilding {
