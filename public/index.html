@@ -1,0 +1,78 @@
+z<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>創大バス帰路ナビ</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header class="app-header">
+        <h1>創大バス帰路ナビ</h1>
+    </header>
+
+    <main class="container">
+        <section class="search-form">
+            <h2>🚌 条件を選択</h2>
+            
+            <div class="form-group">
+                <label>1. 出発するバス停</label>
+                <div class="radio-group">
+                    <label class="radio-label">
+                        <input type="radio" name="busstop" value="so-daimon" checked> 創価大学総大門
+                    </label>
+                    <label class="radio-label">
+                        <input type="radio" name="busstop" value="seimon"> 創価大学正門
+                    </label>
+                    <label class="radio-label">
+                        <input type="radio" name="busstop" value="eikomon"> 創価大学永黄門
+                    </label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>2. 何限終わり？</label>
+                <div class="period-buttons">
+                    <button type="button" class="period-btn active">1限</button>
+                    <button type="button" class="period-btn">2限</button>
+                    <button type="button" class="period-btn">3限</button>
+                    <button type="button" class="period-btn">4限</button>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>3. 到着駅（固定）</label>
+                <div class="fixed-destination">八王子駅北口</div>
+            </div>
+
+            <button type="submit" class="search-submit-btn">最短ルートを検索</button>
+        </section>
+
+        <section class="search-results">
+            <h2>✨ 検索結果</h2>
+            <p class="current-condition">条件：創価大学正門 ➔ 3限終わり</p>
+
+            <div class="result-card primary-card">
+                <div class="card-badge">★ 最短のバス</div>
+                <div class="time-info">
+                    <span class="departure-time">15:10</span> 発
+                </div>
+                <p class="bus-company">西東京バス（八王子駅北口行）</p>
+                <div class="countdown">発車まであと <span class="minutes">12</span> 分</div>
+            </div>
+
+            <div class="result-card secondary-card">
+                <div class="card-badge-sub">次のバス</div>
+                <div class="time-info-sub">
+                    <span class="departure-time-sub">15:22</span> 発
+                </div>
+                <p class="bus-company">西東京バス（八王子駅北口行）</p>
+            </div>
+
+            <p class="notice">※余裕を持ってバス停に向かってください。</p>
+        </section>
+    </main>
+
+</body>
+</html>
