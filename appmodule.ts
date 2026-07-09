@@ -20,11 +20,11 @@ class DTime {
         return new DTime(this.Minutes + m)
     }
 }
-interface SokaBuilding {
+interface SokaBuilding {//建物名とバス停までの時間(分)
     name:string
-    se:number
-    so:number
-    ei:number
+    main_gate:number
+    sodaimon_gate:number
+    eikomon_gate:number
 }
 
 interface Bus {
@@ -61,7 +61,7 @@ function getBuildingData(buildingname:string): SokaBuilding {
     const se = 1;
     const so = 1;
     const ei = 1;
-    return {name:name,se:se,so:so,ei:ei}
+    return {name:name,main_gate:se,sodaimon_gate:so,eikomon_gate:ei}
 }
 
 function get4(d_time:DTime,from:string): Bus[] {
@@ -72,9 +72,9 @@ function get4(d_time:DTime,from:string): Bus[] {
 }
 
 function find4(basetime:DTime, loc:SokaBuilding):Bus[] {
-    const se_mon: Bus[] = get4(basetime.pastedOf(loc.se),"正門");
-    const so_mon: Bus[] = get4(basetime.pastedOf(loc.so),"創大門");
-    const ei_mon: Bus[] = get4(basetime.pastedOf(loc.ei),"栄光門");
+    const se_mon: Bus[] = get4(basetime.pastedOf(loc.main_gate),"正門");
+    const so_mon: Bus[] = get4(basetime.pastedOf(loc.sodaimon_gate),"創大門");
+    const ei_mon: Bus[] = get4(basetime.pastedOf(loc.eikomon_gate),"栄光門");
     const uniq:Set<number> = new Set();
     return [...se_mon, ...so_mon, ...ei_mon].filter(b=>{
         if (uniq.has(b.id)) {
@@ -85,4 +85,4 @@ function find4(basetime:DTime, loc:SokaBuilding):Bus[] {
     }).sort((a,b)=>a.a_time.Minutes-b.a_time.Minutes).splice(0,4)
 }
 
-console.log(find4(new DTime(0),{name:"a",se:1,so:1,ei:1}).map(b=>b.a_time))
+console.log(find4(new DTime(0),{name:"a",main_gate:1,sodaimon_gate:1,eikomon_gate:1}).map(b=>b.a_time))

@@ -7,7 +7,14 @@ import * as fs from 'fs';
         const feed = GtfsRealtimeBindings.transit_realtime.FeedMessage.decode(
             new Uint8Array(buffer)
         );
-        console.log(feed.entity[0]?.tripUpdate?.stopTimeUpdate?.at(0)?.departure);
+        const timed = feed.entity[0]?.tripUpdate?.stopTimeUpdate?.at(0)?.departure?.time;
+        let r:bigint;
+        if (typeof(timed) != "number" && timed) {
+            r = timed.toBigInt();
+        }else{
+            r = BigInt(timed || 0);
+        }
+        console.log(r);
     }
     catch (error) {
         console.log(error);

@@ -5,12 +5,14 @@ export namespace SokaBusData{
      * データ形式
      */
 
-    interface susRoute {//バスのルート情報
-        tripId: string;             //識別子
-        departureStopId: string;    //出発バス停ID
-        departureStopName: string;  //出発バス停名
-        sDepartureTime: string;     //出発時間
-        sArrivalTime: string;       //目的地到着時間
+    export interface busRoute {//バスのルート情報
+        trip_id: string              //識別子
+        route_short_name: string    //ルート名
+        departureStopId: number     //出発バス停ID
+        departureStopName: string   //出発バス停名
+        departureTime: string       //出発時間
+        arrivalTimeA: string        //目的地到着時間A
+        arrivalTimeB: string        //目的地到着時間B
     }
 
     interface sokaBuilding {//建物名とバス停までの時間(分)
@@ -21,21 +23,16 @@ export namespace SokaBusData{
     }
 
     interface reqresult {
-        trip_id: string,
-        route_short_name: string,
-        destA: string,
-        destB: string,
-        dep_time_940: string|null,
-        dep_time_943: string|null,
-        dep_time_890: string|null
+        trip_id: string
+        route_short_name: string
+        destA: string
+        destB: string
+        dep_time_940: number|null
+        dep_time_943: number|null
+        dep_time_890: number|null
     }
-    interface bestbus {
-        trip_id: string,
-        route_short_name: string,
-        destA: string,
-        destB: string,
-        stop:number
-        dep_time: string,
+    interface translate {
+        stop_name:string
     }
 
     /**
@@ -49,7 +46,7 @@ export namespace SokaBusData{
      * @param [limit=5] 取得数
      * @param [stop=0] 目的地の選択(0:JR,1:京王)
      */
-    export function get(time:Temporal.Instant,building:sokaBuilding,limit=5,stop=0) {
+    export function get(time:Temporal.Instant,building:sokaBuilding,limit=5,stop=0): busRoute[] {
         const zonedtime = time.toZonedDateTimeISO("Asia/Tokyo");
         const plainbase = zonedtime.toPlainTime().round({smallestUnit:"seconds"});
         const main_gate_d = Temporal.Duration.from(building.main_gate)
@@ -63,6 +60,10 @@ export namespace SokaBusData{
             readonly:true,
             timeout:1
         });
+        const stopnames:Map<number,string> = new Map();
+        stopnames.set(940,(db.prepare('SELECT stop_name FROM stops WHERE stop_id = ?').get("940") as translate).stop_name);
+        stopnames.set(943,(db.prepare('SELECT stop_name FROM stops WHERE stop_id = ?').get("943") as translate).stop_name);
+        stopnames.set(890,(db.prepare('SELECT stop_name FROM stops WHERE stop_id = ?').get("890") as translate).stop_name);
         const u = db.prepare(`
         SELECT
         trips.trip_id,
@@ -71,9 +72,9 @@ export namespace SokaBusData{
         dest.arrival_time AS destA,
         kst.arrival_time AS destB,
 
-        max(CASE WHEN st.stop_id LIKE '940%' AND st.departure_time >= ? THEN st.departure_time END) AS dep_time_940,
-        max(CASE WHEN st.stop_id LIKE '943%' AND st.departure_time >= ? THEN st.departure_time END) AS dep_time_943,
-        max(CASE WHEN st.stop_id LIKE '890%' AND st.departure_time >= ? THEN st.departure_time END) AS dep_time_890
+        max(CASE WHEN st.stop_id LIKE '940%' AND st.departure_time >= ? THEN st.departure_timestamp END) AS dep_time_940,
+        max(CASE WHEN st.stop_id LIKE '943%' AND st.departure_time >= ? THEN st.departure_timestamp END) AS dep_time_943,
+        max(CASE WHEN st.stop_id LIKE '890%' AND st.departure_time >= ? THEN st.departure_timestamp END) AS dep_time_890
 
         FROM stop_times AS dest
         INNER JOIN trips ON dest.trip_id = trips.trip_id
@@ -92,30 +93,30 @@ export namespace SokaBusData{
         `);
         const datas = u.all(main_gate.toString(),sodaimon_gate.toString(),eikomon_gate.toString(),limit) as reqresult[];
         db.close();
-        let result:bestbus[] = [];
-        let best = zonedtime.toPlainTime();
-        let bestt = "";
+        let result:busRoute[] = [];
+        let best = new Temporal.Duration(0);
+        let bestt = 0;
         let beststop = 0;
         datas.forEach(route => {
             if (route.dep_time_940!==null) {
-                const c = Temporal.PlainTime.from(route.dep_time_940);
-                if (Temporal.PlainTime.compare(best,c) === -1) {
+                const c = new Temporal.Duration(0,0,0,0,0,0,route.dep_time_940).subtract(main_gate_d);
+                if (Temporal.Duration.compare(best,c) === -1) {
                     best = c;
                     bestt = route.dep_time_940;
                     beststop = 940;
                 }
             }
             if (route.dep_time_943!==null) {
-                const c = Temporal.PlainTime.from(route.dep_time_943);
-                if (Temporal.PlainTime.compare(best,c) === -1) {
+                const c = new Temporal.Duration(0,0,0,0,0,0,route.dep_time_943).subtract(sodaimon_gate_d);
+                if (Temporal.Duration.compare(best,c) === -1) {
                     best = c;
                     bestt = route.dep_time_943;
                     beststop = 943;
                 }
             }
             if (route.dep_time_890!==null) {
-                const c = Temporal.PlainTime.from(route.dep_time_890);
-                if (Temporal.PlainTime.compare(best,c) === -1) {
+                const c = new Temporal.Duration(0,0,0,0,0,0,route.dep_time_890).subtract(eikomon_gate_d);
+                if (Temporal.Duration.compare(best,c) === -1) {
                     best = c;
                     bestt = route.dep_time_890;
                     beststop = 890;
@@ -124,10 +125,11 @@ export namespace SokaBusData{
             result.push({
                 trip_id:route.trip_id,
                 route_short_name:route.route_short_name,
-                destA:route.destA,
-                destB:route.destB,
-                stop:beststop,
-                dep_time:bestt
+                arrivalTimeA:route.destA,
+                arrivalTimeB:route.destB,
+                departureStopId:beststop,
+                departureStopName:stopnames.get(beststop) || "undef",
+                departureTime:new Temporal.Duration(0,0,0,0,0,0,bestt).round({largestUnit:"hours"}).toString()
             })
         });
         return result;

@@ -1,3 +1,2 @@
-const a = BigInt(1)
-const b = BigInt(1)
-console.log(a+b)
+console.log(Temporal.Now.instant().round({smallestUnit:"second"}).toZonedDateTimeISO("Asia/Tokyo").toPlainTime().since({second:0}).round({largestUnit:"hour"}).add({hours:0}).hours)
+console.log(new Temporal.Duration(0,0,0,0,0,0,39180).round({largestUnit:"hours"}))

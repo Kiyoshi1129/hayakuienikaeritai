@@ -1,9 +1,14 @@
-import http from "http";
 import express from "express";
 
-let server = http.createServer(
-    (req,res)=>{}
-)
 
 const app = express();
-app.get("/",(req,res)=>{})
+
+app.use(express.static("public"))
+
+app.get("/api/routs", (req, res) => {
+    res.send("Hello World!");
+});
+
+app.listen(3000, () => {
+    console.log("Server is running on http://localhost:3000");
+});

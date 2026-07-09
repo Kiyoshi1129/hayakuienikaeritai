@@ -1,78 +1,88 @@
-z<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>創大バス帰路ナビ</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CU Bus Navi</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <header class="app-header">
-        <h1>創大バス帰路ナビ</h1>
-    </header>
+  <header class="app-header">
+    <div class="header-left">
+      <span class="bus-icon">🚌</span>
+      <div class="header-title-group">
+        <h1>CU Bus Navi</h1>
+        <p class="subtitle">中央大学生のためのバスルート案内</p>
+      </div>
+    </div>
+    <div class="header-right">
+      <span class="notice-top">※時刻は目安です</span>
+    </div>
+  </header>
 
-    <main class="container">
-        <section class="search-form">
-            <h2>🚌 条件を選択</h2>
-            
-            <div class="form-group">
-                <label>1. 出発するバス停</label>
-                <div class="radio-group">
-                    <label class="radio-label">
-                        <input type="radio" name="busstop" value="so-daimon" checked> 創価大学総大門
-                    </label>
-                    <label class="radio-label">
-                        <input type="radio" name="busstop" value="seimon"> 創価大学正門
-                    </label>
-                    <label class="radio-label">
-                        <input type="radio" name="busstop" value="eikomon"> 創価大学永黄門
-                    </label>
-                </div>
-            </div>
+  <main class="app-container">
+    
+    <section class="hero-section">
+      <h2>八王子駅までの最適ルートを案内します</h2>
+      <p>現在いる建物と授業終了時限を選択すると、おすすめの帰宅ルートを表示します。</p>
+    </section>
 
-            <div class="form-group">
-                <label>2. 何限終わり？</label>
-                <div class="period-buttons">
-                    <button type="button" class="period-btn active">1限</button>
-                    <button type="button" class="period-btn">2限</button>
-                    <button type="button" class="period-btn">3限</button>
-                    <button type="button" class="period-btn">4限</button>
-                </div>
-            </div>
+    <section class="search-section">
+      <form id="searchForm" class="search-form">
+        <div class="form-group">
+          <label for="locationSelect">現在地（建物）</label>
+          <select id="locationSelect" required>
+            <option value="" disabled selected>建物名を選択してください</option>
+            <option value="中央教育棟">中央教育棟</option>
+            <option value="本部棟">本部棟</option>
+            <option value="理工学部棟">理工学部棟</option>
+            <option value="看護学部棟">看護学部棟</option>
+            <option value="教育学部棟">教育学部棟</option>
+          </select>
+        </div>
 
-            <div class="form-group">
-                <label>3. 到着駅（固定）</label>
-                <div class="fixed-destination">八王子駅北口</div>
-            </div>
+        <div class="form-group">
+          <label for="periodSelect">授業終了時限</label>
+          <select id="periodSelect" required>
+            <option value="" disabled selected>時限を選択してください</option>
+            <option value="1限終わり">1限終わり</option>
+            <option value="2限終わり">2限終わり</option>
+            <option value="3限終わり">3限終わり</option>
+            <option value="4限終わり">4限終わり</option>
+            <option value="5限終わり">5限終わり</option>
+          </select>
+        </div>
 
-            <button type="submit" class="search-submit-btn">最短ルートを検索</button>
-        </section>
+        <button type="submit" class="search-btn">
+          <span class="search-icon">🔍</span> ルートを検索
+        </button>
+      </form>
+    </section>
 
-        <section class="search-results">
-            <h2>✨ 検索結果</h2>
-            <p class="current-condition">条件：創価大学正門 ➔ 3限終わり</p>
+    <div id="resultsArea" class="results-area is-hidden">
+      
+      <section class="result-section">
+        <h3 class="section-title"><span class="star-icon">⭐</span> おすすめルート</h3>
+        <div id="recommendRouteCard">
+          </div>
+      </section>
 
-            <div class="result-card primary-card">
-                <div class="card-badge">★ 最短のバス</div>
-                <div class="time-info">
-                    <span class="departure-time">15:10</span> 発
-                </div>
-                <p class="bus-company">西東京バス（八王子駅北口行）</p>
-                <div class="countdown">発車まであと <span class="minutes">12</span> 分</div>
-            </div>
+      <section class="result-section">
+        <h3 class="section-title"><span class="sub-bus-icon">🚌</span> その他のルート</h3>
+        <div id="otherRoutesList" class="other-routes-list">
+          </div>
+      </section>
 
-            <div class="result-card secondary-card">
-                <div class="card-badge-sub">次のバス</div>
-                <div class="time-info-sub">
-                    <span class="departure-time-sub">15:22</span> 発
-                </div>
-                <p class="bus-company">西東京バス（八王子駅北口行）</p>
-            </div>
+    </div>
 
-            <p class="notice">※余裕を持ってバス停に向かってください。</p>
-        </section>
-    </main>
+  </main>
 
+  <footer class="app-footer">
+    <p>時刻は目安です。交通状況等により前後する場合があります。</p>
+    <p class="copyright">&copy; 2026 CU Bus Navi. All rights reserved.</p>
+  </footer>
+
+  <script src="script.js"></script>
 </body>
 </html>
