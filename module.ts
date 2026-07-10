@@ -15,7 +15,7 @@ export namespace SokaBusData {
         arrivalTime: string;        //目的地到着時間A
         walk: number;               //徒歩時間
     }
-
+    
     interface sokaBuilding {//建物名とバス停までの時間(分)
         name: string;
         main_gate: number;
@@ -172,7 +172,7 @@ export namespace SokaBusData {
     }
 
     export function decorator(buses: busRoute[]): busExport[] {
-        return buses.map(bus => { return { route_name: bus.route_short_name, stop_name:bus.departureStopName, dest:bus.arrivalTime, dep:toTimeString(bus.departureStop), b_dep: toTimeString(bus.departureBuild), walk:bus.walk, is_delay: false } })
+        return buses.map(bus => { return { route_name: bus.route_short_name, stop_name:bus.departureStopName, dest:bus.arrivalTime, dep:toTimeString(bus.departureStop), b_dep: toTimeString(bus.departureBuild), walk:bus.walk, is_delay: false, fare:"330円" } })
     }
 }
 // console.log(SokaBusData.search(Temporal.Now.zonedDateTimeISO(), { name: "a", eikomon_gate: { minutes: 8 }, main_gate: { minutes: 11 }, sodaimon_gate: { minutes: 7 } }, 10))
