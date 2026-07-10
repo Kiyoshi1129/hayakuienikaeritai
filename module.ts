@@ -6,47 +6,47 @@ export namespace SokaBusData {
      */
 
     export interface busRoute {//バスのルート情報
-        trip_id: string             //識別子
-        route_short_name: string    //ルート名
-        departureStopId: number     //出発バス停ID
-        departureStopName: string   //出発バス停名
-        departureStop: number       //バス出発時間
-        departureBuild: number      //建物推奨出発時間
-        arrivalTime: string         //目的地到着時間A
-        walk: number                //徒歩時間
+        trip_id: string;            //識別子
+        route_short_name: string;   //ルート名
+        departureStopId: number;    //出発バス停ID
+        departureStopName: string;  //出発バス停名
+        departureStop: number;      //バス出発時間
+        departureBuild: number;     //建物推奨出発時間
+        arrivalTime: string;        //目的地到着時間A
+        walk: number;               //徒歩時間
     }
 
     interface sokaBuilding {//建物名とバス停までの時間(分)
-        name: string
-        main_gate: Temporal.DurationLike
-        sodaimon_gate: Temporal.DurationLike
-        eikomon_gate: Temporal.DurationLike
+        name: string;
+        main_gate: number;
+        sodaimon_gate: number;
+        eikomon_gate: number;
     }
 
     interface reqresult {
-        trip_id: string
-        route_short_name: string
-        destA: string
-        destB: string
-        dep_time_940: number | null
-        dep_time_943: number | null
-        dep_time_890: number | null
+        trip_id: string;
+        route_short_name: string;
+        destA: string;
+        destB: string;
+        dep_time_940: number | null;
+        dep_time_943: number | null;
+        dep_time_890: number | null;
     }
     interface translate {
-        stop_name: string
+        stop_name: string;
     }
 
     interface busExport {
-        route_name:  string
-        stop_name:  string
-        dest:  string
-        dep:   string
-        b_dep: string
-        walk:  number
-        is_delay: boolean
-        delay?: string
-        destf?: string
-        depf?:  string
+        route_name:  string;
+        stop_name:  string;
+        dest:  string;
+        dep:   string;
+        b_dep: string;
+        walk:  number;
+        is_delay: boolean;
+        delay?: string;
+        destf?: string;
+        depf?:  string;
     }
 
     /**
@@ -62,12 +62,12 @@ export namespace SokaBusData {
      */
     export function search(zonedtime: Temporal.ZonedDateTime, building: sokaBuilding, limit = 5, stop = 0): busRoute[] {
         const plainbase = zonedtime.toPlainTime().round({ smallestUnit: "seconds" });
-        const main_gate_d = Temporal.Duration.from(building.main_gate)
-        const sodaimon_gate_d = Temporal.Duration.from(building.sodaimon_gate)
-        const eikomon_gate_d = Temporal.Duration.from(building.eikomon_gate)
-        const main_gate = plainbase.add(main_gate_d)
-        const sodaimon_gate = plainbase.add(sodaimon_gate_d)
-        const eikomon_gate = plainbase.add(eikomon_gate_d)
+        const main_gate_d = Temporal.Duration.from({minutes:building.main_gate});
+        const sodaimon_gate_d = Temporal.Duration.from({minutes:building.sodaimon_gate});
+        const eikomon_gate_d = Temporal.Duration.from({minutes:building.eikomon_gate});
+        const main_gate = plainbase.add(main_gate_d);
+        const sodaimon_gate = plainbase.add(sodaimon_gate_d);
+        const eikomon_gate = plainbase.add(eikomon_gate_d);
         const db = Database("data/gtfs.db", {
             fileMustExist: true,
             readonly: true,
@@ -119,8 +119,8 @@ export namespace SokaBusData {
                     best = c;
                     bestt = route.dep_time_940;
                     beststop = 940;
-                    walk = main_gate_d.round("minutes").minutes
-                    must = bestt + main_gate_d.total("seconds")
+                    walk = main_gate_d.round("minutes").minutes;
+                    must = bestt + main_gate_d.total("seconds");
                 }
             }
             if (route.dep_time_943 !== null) {
@@ -129,8 +129,8 @@ export namespace SokaBusData {
                     best = c;
                     bestt = route.dep_time_943;
                     beststop = 943;
-                    walk = sodaimon_gate_d.round("minutes").minutes
-                    must = bestt + sodaimon_gate_d.total("seconds")
+                    walk = sodaimon_gate_d.round("minutes").minutes;
+                    must = bestt + sodaimon_gate_d.total("seconds");
                 }
             }
             if (route.dep_time_890 !== null) {
@@ -139,11 +139,11 @@ export namespace SokaBusData {
                     best = c;
                     bestt = route.dep_time_890;
                     beststop = 890;
-                    walk = eikomon_gate_d.round("minutes").minutes
-                    must = bestt + eikomon_gate_d.total("seconds")
+                    walk = eikomon_gate_d.round("minutes").minutes;
+                    must = bestt + eikomon_gate_d.total("seconds");
                 }
             }
-            let arrive
+            let arrive;
             switch (stop) {
                 case 1:
                     arrive = route.destB;
