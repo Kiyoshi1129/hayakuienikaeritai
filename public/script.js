@@ -6,6 +6,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const recommendRouteCard = document.getElementById('recommendRouteCard');
   const otherRoutesList = document.getElementById('otherRoutesList');
 
+  window.customLimit = 4
+
   // フォーム送信時のイベント処理
   searchForm.addEventListener('submit', (e) => {
     e.preventDefault();
@@ -20,7 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // fetch()によるバックエンドとの非同期通信
   function fetchRouteData(building, period) {
-    const apiUrl = `/api/routes?building=${encodeURIComponent(building)}&period=${encodeURIComponent(period)}`;
+    const apiUrl = `/api/routes?building=${encodeURIComponent(building)}&period=${encodeURIComponent(period)}&limit=${window.customLimit}`;
 
     fetch(apiUrl)
       .then(response => {

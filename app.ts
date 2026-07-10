@@ -19,10 +19,15 @@ interface bus1{
 interface query {
     building?:string
     period?:string
+    limit?:string
 }
 app.get("/api/routes", (req:Request<any,any,any,query>, res:Response) => {
     if (req.query.building === undefined) {
         res.status(400).send("Need a param;building")
+        return;
+    }
+    if (!/^\d{1,2}/.test(req.query.limit || "4")) {
+        res.status(400).send(`${req.query.limit} is not a number`)
         return;
     }
     const building = SokaBuilding.getBuildingTime(req.query.building)
@@ -50,7 +55,7 @@ app.get("/api/routes", (req:Request<any,any,any,query>, res:Response) => {
         default:
             break;
     }
-    const buses = SokaBusData.search(time,building,4,0)
+    const buses = SokaBusData.search(time,building,Number(req.query.limit || 4),0)
     const result:bus1[] = SokaBusData.decorator(buses).map(bus=>{return {
         busStop: bus.stop_name,
         walkTime: bus.walk,
