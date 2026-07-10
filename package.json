@@ -19,5 +19,8 @@
   },
   "allowScripts": {
     "better-sqlite3@12.11.1": true
+  },
+  "scripts": {
+    "start": "node ./dist/app.js"
   }
 }

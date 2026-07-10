@@ -63,6 +63,15 @@ app.get("/api/routes", (req:Request<any,any,any,query>, res:Response) => {
     res.json(result);
 });
 
-app.listen(3000, () => {
+const server = app.listen(3000, () => {
     console.log("Server is running on http://localhost:3000");
 });
+
+const stop = ()=>{
+    console.log('SIGTERM signal received: closing HTTP server');
+    server.close(() => {
+        console.log('HTTP server closed');
+    })
+}
+process.on('SIGTERM', stop);
+process.on('SIGINT', stop);
