@@ -15,19 +15,6 @@ interface bus1{
     duration: number;
     startTime:string
 }
-interface apiproto {
-    recommendRoute: {
-        duration: '17分',
-        walkTime: '5分',
-        limitTime: string,       // バス発車の5分前（建物を今から3分後に出れば間に合う計算）
-        busStop: '正門バス停',
-        via: 'ひ06経由',                       // 経由データ
-        departureTime: string
-        arrivalTime: string
-        destination: '八王子駅'
-    }
-    otherRoutes: bus1[]
-}
 
 interface query {
     building?:string
@@ -40,7 +27,7 @@ app.get("/api/routes", (req:Request<any,any,any,query>, res:Response) => {
     }
     const building = SokaBuilding.getBuildingTime(req.query.building)
     if (building === undefined) {
-        res.status(400).send(`BuildingData[${req.query.building} is not found]`)
+        res.status(400).send(`BuildingData[${req.query.building}] is not found`)
         return
     }
     let time = Temporal.Now.zonedDateTimeISO()
