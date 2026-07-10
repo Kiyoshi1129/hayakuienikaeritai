@@ -14,6 +14,7 @@ export namespace SokaBusData {
         departureBuild: number;     //建物推奨出発時間
         arrivalTime: string;        //目的地到着時間A
         walk: number;               //徒歩時間
+        duration:number;            //所要時間
     }
     
     interface sokaBuilding {//建物名とバス停までの時間(分)
@@ -27,7 +28,9 @@ export namespace SokaBusData {
         trip_id: string;
         route_short_name: string;
         destA: string;
+        desttA: number;
         destB: string;
+        desttB: number;
         dep_time_940: number | null;
         dep_time_943: number | null;
         dep_time_890: number | null;
@@ -47,6 +50,7 @@ export namespace SokaBusData {
         delay?: string;
         destf?: string;
         depf?:  string;
+        duration:number;
     }
 
     /**
@@ -83,7 +87,9 @@ export namespace SokaBusData {
         routes.route_short_name,
 
         dest.arrival_time AS destA,
+        dest.arrival_timestamp AS desttA,
         kst.arrival_time AS destB,
+        kst.arrival_timestamp AS desttB,
 
         max(CASE WHEN st.stop_id LIKE '940%' AND st.departure_time >= ? THEN st.departure_timestamp END) AS dep_time_940,
         max(CASE WHEN st.stop_id LIKE '943%' AND st.departure_time >= ? THEN st.departure_timestamp END) AS dep_time_943,
@@ -120,7 +126,7 @@ export namespace SokaBusData {
                     bestt = route.dep_time_940;
                     beststop = 940;
                     walk = main_gate_d.round("minutes").minutes;
-                    must = bestt + main_gate_d.total("seconds");
+                    must = bestt - main_gate_d.total("seconds");
                 }
             }
             if (route.dep_time_943 !== null) {
@@ -130,7 +136,7 @@ export namespace SokaBusData {
                     bestt = route.dep_time_943;
                     beststop = 943;
                     walk = sodaimon_gate_d.round("minutes").minutes;
-                    must = bestt + sodaimon_gate_d.total("seconds");
+                    must = bestt - sodaimon_gate_d.total("seconds");
                 }
             }
             if (route.dep_time_890 !== null) {
@@ -140,7 +146,7 @@ export namespace SokaBusData {
                     bestt = route.dep_time_890;
                     beststop = 890;
                     walk = eikomon_gate_d.round("minutes").minutes;
-                    must = bestt + eikomon_gate_d.total("seconds");
+                    must = bestt - eikomon_gate_d.total("seconds");
                 }
             }
             let arrive;
@@ -161,18 +167,19 @@ export namespace SokaBusData {
                 // departureTime:new Temporal.Duration(0,0,0,0,0,0,bestt).round({largestUnit:"hours"}).toString()
                 departureStop: bestt,
                 departureBuild: must,
-                walk:walk
+                walk:walk,
+                duration:route.desttA-must
             })
         });
         return result;
     }
     function toTimeString(time_n: number): string {
-        const t = new Temporal.Duration(0, 0, 0, 0, 0, 0, time_n).round({ largestUnit: "hours" })
-        return `${t.hours}:${t.minutes}:${t.seconds}`
+        const t = new Temporal.Duration(0, 0, 0, 0, 0, 0, time_n).round({ largestUnit: "hours" ,smallestUnit:"minutes"})
+        return `${t.hours.toString().padStart(2,"0")}:${t.minutes.toString().padStart(2,"0")}`
     }
 
     export function decorator(buses: busRoute[]): busExport[] {
-        return buses.map(bus => { return { route_name: bus.route_short_name, stop_name:bus.departureStopName, dest:bus.arrivalTime, dep:toTimeString(bus.departureStop), b_dep: toTimeString(bus.departureBuild), walk:bus.walk, is_delay: false, fare:"330円" } })
+        return buses.map(bus => { return { route_name: bus.route_short_name, stop_name:bus.departureStopName, dest:bus.arrivalTime, dep:toTimeString(bus.departureStop), b_dep: toTimeString(bus.departureBuild), walk:bus.walk, is_delay: false, duration:bus.duration} })
     }
 }
 // console.log(SokaBusData.search(Temporal.Now.zonedDateTimeISO(), { name: "a", eikomon_gate: { minutes: 8 }, main_gate: { minutes: 11 }, sodaimon_gate: { minutes: 7 } }, 10))

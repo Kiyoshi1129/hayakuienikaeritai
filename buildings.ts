@@ -8,9 +8,9 @@ export namespace SokaBuilding {
         eikomon_gate:number
     }
 
-    export function getBuildingTime(name:string): sokaBuilding { //dummy
+    export function getBuildingTime(name:string): sokaBuilding|undefined { //dummy
         const db = Database('./data/buildings.db');
-        const data = db.prepare("SELECT * FROM buildings WHERE buildings.name = ?;").get(name) as sokaBuilding
+        const data = db.prepare("SELECT * FROM buildings WHERE buildings.name = ?;").get(name) as sokaBuilding|undefined
         db.close();
         return data
     }
