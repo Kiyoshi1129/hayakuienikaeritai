@@ -37,21 +37,11 @@ app.get("/api/routes", (req:Request<any,any,any,query>, res:Response) => {
     }
     let time = Temporal.Now.zonedDateTimeISO()
     switch (req.query.period) {
-        case "1限終わり":
-            time = time.with({hour:10,minute:45})
-            break;
-        case "2限終わり":
-            time = time.with({hour:12,minute:15})
-            break;
-        case "3限終わり":
-            time = time.with({hour:14,minute:35})
-            break;
-        case "4限終わり":
-            time = time.with({hour:16,minute:20})
-            break;
-        case "5限終わり":
-            time = time.with({hour:18,minute:5})
-            break;
+        case "1限終わり":time = time.with({hour:10,minute:30});break;
+        case "2限終わり":time = time.with({hour:12,minute:15});break;
+        case "3限終わり":time = time.with({hour:14,minute:35});break;
+        case "4限終わり":time = time.with({hour:16,minute:20});break;
+        case "5限終わり":time = time.with({hour:18,minute: 5});break;
         default:
             break;
     }
